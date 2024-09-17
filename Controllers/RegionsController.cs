@@ -3,6 +3,7 @@ using DemoAPIProject.DataDbContext;
 using DemoAPIProject.Models.Domain;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace API.Controllers
 {
@@ -18,9 +19,9 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetAll()
+        public async Task<IActionResult> GetAll()
         {
-            List<Region> regions = _context.Regions.ToList();
+            List<Region> regions = await _context.Regions.ToListAsync();
 
             #region Mapping Domain Models to DTO
             var regionDTO = new List<RegionDTO>();
@@ -42,9 +43,9 @@ namespace API.Controllers
 
         [HttpGet]
         [Route("{id:guid}")]//Route Constraints
-        public IActionResult GetById([FromRoute] Guid id)
+        public async Task<IActionResult> GetById([FromRoute] Guid id)
         {
-            var region = _context.Regions.Where(r => r.Id == id).FirstOrDefault();
+            var region = await _context.Regions.Where(r => r.Id == id).FirstOrDefaultAsync();
             if (region == null)
                 return NotFound();
 
@@ -63,7 +64,7 @@ namespace API.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create([FromBody] AddRequestDTO addRequestDTO)
+        public async Task<IActionResult> Create([FromBody] AddRequestDTO addRequestDTO)
         {
             #region Mapping data from DTO to Model
             var regions = new Region()
@@ -75,8 +76,8 @@ namespace API.Controllers
             #endregion
 
             //Add to Domain Model
-            _context.Regions.Add(regions);
-            _context.SaveChanges();
+            await _context.Regions.AddAsync(regions);
+            await _context.SaveChangesAsync();
 
             #region Storing the deleted data into DTO and sending it to end user
             var regionDTO = new RegionDTO()
@@ -93,9 +94,9 @@ namespace API.Controllers
 
         [HttpPut]
         [Route("{id:guid}")]
-        public IActionResult PutData([FromRoute] Guid id, [FromBody] UpdateReqDTO updateReqDTO)
+        public async Task<IActionResult> PutData([FromRoute] Guid id, [FromBody] UpdateReqDTO updateReqDTO)
         {
-            var regionData = _context.Regions.Where(r => r.Id == id).FirstOrDefault();
+            var regionData = await _context.Regions.Where(r => r.Id == id).FirstOrDefaultAsync();
 
             if (regionData == null)
                 return NotFound();
@@ -106,8 +107,7 @@ namespace API.Controllers
             regionData.RegionImageUrl = updateReqDTO.RegionImageUrl;
             #endregion
 
-            _context.Regions.Update(regionData);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             #region Storing the deleted data into DTO and sending it to end user
             var regionDTO = new RegionDTO()
@@ -123,9 +123,9 @@ namespace API.Controllers
 
         [HttpDelete]
         [Route("{id:guid}")]
-        public IActionResult DeleteByID([FromRoute] Guid id)
+        public async Task<IActionResult> DeleteByID([FromRoute] Guid id)
         {
-            var regions = _context.Regions.Where(r => r.Id == id).FirstOrDefault();
+            var regions = await _context.Regions.Where(r => r.Id == id).FirstOrDefaultAsync();
 
             if (regions == null)
                 return NotFound();
