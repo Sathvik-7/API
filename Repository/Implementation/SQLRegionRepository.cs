@@ -20,14 +20,9 @@ namespace API.Repository.Implementation
             return await _dbContext.Regions.ToListAsync();
         }
 
-        public async Task<Region> GetById(Guid id)
+        public async Task<Region?> GetById(Guid id)
         {
-            var regionData = await _dbContext.Regions.Where(r => r.Id == id).FirstOrDefaultAsync();
-
-            if (regionData == null)
-                return null;
-
-            return regionData;
+            return await _dbContext.Regions.Where(r => r.Id == id).FirstOrDefaultAsync();
         }
 
         public async Task<int> CreateRegions(Region region)
@@ -44,7 +39,11 @@ namespace API.Repository.Implementation
             if (regionData == null)
                 return 0;
 
-            _dbContext.Regions.Update(region);
+            regionData.Code = region.Code;
+            regionData.Name = region.Name;
+            regionData.RegionImageUrl = region.RegionImageUrl;
+            
+            //_dbContext.Regions.Update(region);
 
             return await _dbContext.SaveChangesAsync();
         }

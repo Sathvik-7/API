@@ -8,7 +8,7 @@ namespace API.Repository.Interface
     {
        Task<List<Region>> GetAllData();
 
-        Task<Region> GetById(Guid id);
+        Task<Region?> GetById(Guid id);
 
         Task<int> CreateRegions(Region region);
 

@@ -30,7 +30,6 @@ namespace API.Controllers
 
             #region Mapping Domain Models to DTO
             var regionDTO = new List<RegionDTO>();
-
             foreach (var region in regions)
             {
                 regionDTO.Add(new RegionDTO()
@@ -42,6 +41,7 @@ namespace API.Controllers
                 });
             }
             #endregion
+
             return Ok(regionDTO);
             //return Ok(regions);
         }
@@ -90,7 +90,7 @@ namespace API.Controllers
             if (r == 0)
                 return BadRequest("Record insert failed");
 
-            #region Storing the deleted data into DTO and sending it to end user
+            #region Storing the data into DTO and sending it to end user
             var regionDTO = new RegionDTO()
             {
                 Id = regions.Id,
@@ -125,7 +125,7 @@ namespace API.Controllers
             if (r == 0) 
                 return BadRequest("Update Failed..");
 
-            #region Storing the deleted data into DTO and sending it to end user
+            #region Storing the updated data into DTO and sending it to end user
             var regionDTO = new RegionDTO()
             {
                 Id = regionData.Id,
