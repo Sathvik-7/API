@@ -1,7 +1,9 @@
 ﻿using API.Models.DTO;
+using API.Repository.Interface;
 using DemoAPIProject.DataDbContext;
 using DemoAPIProject.Models.Domain;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,16 +14,19 @@ namespace API.Controllers
     public class RegionsController : ControllerBase
     {
         private readonly WalksDbContext _context;
+        private readonly IRegionRepository regionRepository;
 
-        public RegionsController(WalksDbContext dbContext)
+        public RegionsController(WalksDbContext dbContext,IRegionRepository regionRepository)
         {
             _context = dbContext;
+            this.regionRepository = regionRepository;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            List<Region> regions = await _context.Regions.ToListAsync();
+            //Reposiory Layer - Dependency Injection
+            List<Region> regions = await regionRepository.GetAllData();//await _context.Regions.ToListAsync();
 
             #region Mapping Domain Models to DTO
             var regionDTO = new List<RegionDTO>();
@@ -45,7 +50,8 @@ namespace API.Controllers
         [Route("{id:guid}")]//Route Constraints
         public async Task<IActionResult> GetById([FromRoute] Guid id)
         {
-            var region = await _context.Regions.Where(r => r.Id == id).FirstOrDefaultAsync();
+            //Reposiory Layer - Dependency Injection
+            var region = await regionRepository.GetById(id);//_context.Regions.Where(r => r.Id == id).FirstOrDefaultAsync();
             if (region == null)
                 return NotFound();
 
@@ -76,8 +82,13 @@ namespace API.Controllers
             #endregion
 
             //Add to Domain Model
-            await _context.Regions.AddAsync(regions);
-            await _context.SaveChangesAsync();
+            //await _context.Regions.AddAsync(regions);
+            //await _context.SaveChangesAsync();
+
+            //Reposiory Layer - Dependency Injection
+            int r = await regionRepository.CreateRegions(regions);
+            if (r == 0)
+                return BadRequest("Record insert failed");
 
             #region Storing the deleted data into DTO and sending it to end user
             var regionDTO = new RegionDTO()
@@ -88,6 +99,7 @@ namespace API.Controllers
                 RegionImageUrl = regions.RegionImageUrl,
             };
             #endregion
+
             //return Ok();
             return CreatedAtAction(nameof(GetById), new { id = regionDTO.Id }, regionDTO);
         }
@@ -96,7 +108,8 @@ namespace API.Controllers
         [Route("{id:guid}")]
         public async Task<IActionResult> PutData([FromRoute] Guid id, [FromBody] UpdateReqDTO updateReqDTO)
         {
-            var regionData = await _context.Regions.Where(r => r.Id == id).FirstOrDefaultAsync();
+            //Reposiory Layer - Dependency Injection
+            var regionData = await regionRepository.GetById(id);//_context.Regions.Where(r => r.Id == id).FirstOrDefaultAsync();
 
             if (regionData == null)
                 return NotFound();
@@ -107,7 +120,10 @@ namespace API.Controllers
             regionData.RegionImageUrl = updateReqDTO.RegionImageUrl;
             #endregion
 
-            await _context.SaveChangesAsync();
+            //Reposiory Layer - Dependency Injection
+            int r = await regionRepository.UpdateRegions(id, regionData);
+            if (r == 0) 
+                return BadRequest("Update Failed..");
 
             #region Storing the deleted data into DTO and sending it to end user
             var regionDTO = new RegionDTO()
@@ -125,13 +141,19 @@ namespace API.Controllers
         [Route("{id:guid}")]
         public async Task<IActionResult> DeleteByID([FromRoute] Guid id)
         {
-            var regions = await _context.Regions.Where(r => r.Id == id).FirstOrDefaultAsync();
+            //Reposiory Layer - Dependency Injection
+            var regions = await regionRepository.GetById(id);// _context.Regions.Where(r => r.Id == id).FirstOrDefaultAsync();
 
             if (regions == null)
                 return NotFound();
 
-            _context.Regions.Remove(regions);
-            _context.SaveChanges();
+            //Reposiory Layer - Dependency Injection
+            int r = await regionRepository.DeleteRegions(id);
+            if (r == 0) 
+                return NotFound("Record delete failed");
+
+            //_context.Regions.Remove(regions);
+            //_context.SaveChanges();
 
             #region Storing the deleted data into DTO and sending it to end user
             var regionsDTO = new RegionDTO()

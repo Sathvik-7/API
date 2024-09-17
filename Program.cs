@@ -1,3 +1,5 @@
+using API.Repository.Implementation;
+using API.Repository.Interface;
 using DemoAPIProject.DataDbContext;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,6 +15,9 @@ builder.Services.AddSwaggerGen();
 //Db Connection
 builder.Services.AddDbContext<WalksDbContext>(
     options =>options.UseSqlServer(builder.Configuration.GetConnectionString("WalksConnection")));
+
+//Dependency Injection
+builder.Services.AddScoped<IRegionRepository,SQLRegionRepository>();
 
 var app = builder.Build();
 
