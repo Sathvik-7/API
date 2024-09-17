@@ -1,3 +1,4 @@
+using API.AutoMapping;
 using API.Repository.Implementation;
 using API.Repository.Interface;
 using DemoAPIProject.DataDbContext;
@@ -18,6 +19,9 @@ builder.Services.AddDbContext<WalksDbContext>(
 
 //Dependency Injection
 builder.Services.AddScoped<IRegionRepository,SQLRegionRepository>();
+
+//AutoMapper
+builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 
 var app = builder.Build();
 
