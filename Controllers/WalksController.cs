@@ -69,7 +69,7 @@ namespace API.Controllers
             //Inserting the data 
             var r = await walkRepository.UpdateWalkAsync(id,walksData);
 
-            if (r == 0)
+            if (r == null)
                 return NotFound();
 
             return Ok(mapper.Map<WalkDTO>(walksData));

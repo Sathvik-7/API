@@ -36,12 +36,12 @@ namespace API.Repository.Implementation
             return await _dbContext.Walks.Where(w => w.Id == id).FirstOrDefaultAsync();
         }
 
-        public async Task<int?> UpdateWalkAsync(Guid id, Walk walk)
+        public async Task<Walk?> UpdateWalkAsync(Guid id, Walk walk)
         {
             var walksData = await _dbContext.Walks.Where(w => w.Id == id).FirstOrDefaultAsync();
 
             if (walksData == null)
-                return 0;
+                return null;
 
             walksData.Name = walk.Name;
             walksData.Description = walk.Description;
@@ -49,6 +49,8 @@ namespace API.Repository.Implementation
             walksData.WalkImageUrl = walk.WalkImageUrl;
 
             await _dbContext.SaveChangesAsync();
+
+            return walksData;
         }
     }
 }

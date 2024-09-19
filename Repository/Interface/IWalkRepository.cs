@@ -12,6 +12,6 @@ namespace API.Repository.Interface
 
         Task<int>  DeleteWalkAsync(Guid id);
 
-        Task<int?> UpdateWalkAsync(Guid id,Walk walk);
+        Task<Walk?> UpdateWalkAsync(Guid id,Walk walk);
     }
 }
