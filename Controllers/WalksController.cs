@@ -44,15 +44,22 @@ namespace API.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] AddWalksDTO addWalksDTO)
         {
-            if (addWalksDTO == null)
+            if (ModelState.IsValid)
+            {
+                if (addWalksDTO == null)
+                    return BadRequest();
+
+                //Mapping DTO to Domain Model
+                var walksData = mapper.Map<Walk>(addWalksDTO);
+                //Inserting the data 
+                await walkRepository.AddWalkAsync(walksData);
+
+                return Ok(mapper.Map<WalkDTO>(walksData));
+            }
+            else
+            {
                 return BadRequest();
-
-            //Mapping DTO to Domain Model
-            var walksData = mapper.Map<Walk>(addWalksDTO);
-            //Inserting the data 
-            await walkRepository.AddWalkAsync(walksData);
-
-            return Ok(mapper.Map<WalkDTO>(walksData));
+            }
         }
 
 
@@ -60,19 +67,27 @@ namespace API.Controllers
         [Route("{id:Guid}")]
         public async Task<IActionResult> PutData([FromRoute]Guid id,[FromBody] UpdateWalksDTO upWalksDTO)
         {
-            if (upWalksDTO == null)
+            if (ModelState.IsValid)
+            {
+                if (upWalksDTO == null)
+                    return BadRequest();
+
+                //Mapping DTO to Domain Model
+                var walksData = mapper.Map<Walk>(upWalksDTO);
+
+                //Inserting the data 
+                var r = await walkRepository.UpdateWalkAsync(id, walksData);
+
+                if (r == null)
+                    return NotFound();
+
+                return Ok(mapper.Map<WalkDTO>(walksData));
+            }
+            else
+            {
                 return BadRequest();
+            }
 
-            //Mapping DTO to Domain Model
-            var walksData = mapper.Map<Walk>(upWalksDTO);
-
-            //Inserting the data 
-            var r = await walkRepository.UpdateWalkAsync(id,walksData);
-
-            if (r == null)
-                return NotFound();
-
-            return Ok(mapper.Map<WalkDTO>(walksData));
         }
 
         [HttpDelete]
