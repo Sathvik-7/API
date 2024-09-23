@@ -1,4 +1,5 @@
-﻿using API.Models.DTO;
+﻿using API.Filters;
+using API.Models.DTO;
 using API.Repository.Interface;
 using AutoMapper;
 using DemoAPIProject.DataDbContext;
@@ -16,8 +17,8 @@ namespace API.Controllers
     {
         private readonly IRegionRepository regionRepository;
         private readonly IMapper mapper;
-        
-        public RegionsController(IRegionRepository regionRepository,IMapper mapper)
+
+        public RegionsController(IRegionRepository regionRepository, IMapper mapper)
         {
             this.regionRepository = regionRepository;
             this.mapper = mapper;
@@ -45,7 +46,7 @@ namespace API.Controllers
 
             // AutoMapper source = regions ; destination = RegionDTO
             var regionDTO = mapper.Map<List<RegionDTO>>(regions);
-            
+
             return Ok(regionDTO);
         }
 
@@ -60,85 +61,74 @@ namespace API.Controllers
 
             //AutoMapper source = region ; destination = RegionDTO
             var regionDTO = mapper.Map<RegionDTO>(region);
-            
+
             return Ok(regionDTO);
         }
 
         [HttpPost]
+        [ValidationStateFilter]
         public async Task<IActionResult> Create([FromBody] AddRequestDTO addRequestDTO)
         {
-            if (ModelState.IsValid)
-            {
-                #region Mapping data from DTO to Model - Outdated
-                //var regions = new Region()
-                //{
-                //    Name = addRequestDTO.Name,
-                //    Code = addRequestDTO.Code,
-                //    RegionImageUrl = addRequestDTO.RegionImageUrl
-                //};
-                #endregion
+            #region Mapping data from DTO to Model - Outdated
+            //var regions = new Region()
+            //{
+            //    Name = addRequestDTO.Name,
+            //    Code = addRequestDTO.Code,
+            //    RegionImageUrl = addRequestDTO.RegionImageUrl
+            //};
+            #endregion
 
-                //AutoMapper Source = addRequestDTO ; Destination = Region
-                var regions = mapper.Map<Region>(addRequestDTO);
-                
-                //Reposiory Layer - Dependency Injection
-                int r = await regionRepository.CreateRegions(regions);
-                if (r == 0)
-                    return BadRequest("Record insert failed");
+            //AutoMapper Source = addRequestDTO ; Destination = Region
+            var regions = mapper.Map<Region>(addRequestDTO);
 
-                #region Storing the data into DTO and sending it to end user
-                //var regionDTO = new RegionDTO()
-                //{
-                //    Id = regions.Id,
-                //    Name = regions.Name,
-                //    Code = regions.Code,
-                //    RegionImageUrl = regions.RegionImageUrl,
-                //};
-                #endregion
+            //Reposiory Layer - Dependency Injection
+            int r = await regionRepository.CreateRegions(regions);
+            if (r == 0)
+                return BadRequest("Record insert failed");
 
-                //AutoMapper Source = regions ; Destination = RegionDTO
-                var regionDTO = mapper.Map<RegionDTO>(regions);
+            #region Storing the data into DTO and sending it to end user
+            //var regionDTO = new RegionDTO()
+            //{
+            //    Id = regions.Id,
+            //    Name = regions.Name,
+            //    Code = regions.Code,
+            //    RegionImageUrl = regions.RegionImageUrl,
+            //};
+            #endregion
 
-                return CreatedAtAction(nameof(GetById), new { id = regionDTO.Id }, regionDTO);
-            }
-            else
-            {
-                return BadRequest(ModelState);
-            }
+            //AutoMapper Source = regions ; Destination = RegionDTO
+            var regionDTO = mapper.Map<RegionDTO>(regions);
+
+            return CreatedAtAction(nameof(GetById), new { id = regionDTO.Id }, regionDTO);
         }
 
         [HttpPut]
         [Route("{id:guid}")]
+        [ValidationStateFilter]
         public async Task<IActionResult> PutData([FromRoute] Guid id, [FromBody] UpdateReqDTO updateReqDTO)
         {
-            if (ModelState.IsValid)
-            {
-                //Reposiory Layer - Dependency Injection
-                var regionData = await regionRepository.GetById(id);//_context.Regions.Where(r => r.Id == id).FirstOrDefaultAsync();
 
-                if (regionData == null)
-                    return NotFound();
+            //Reposiory Layer - Dependency Injection
+            var regionData = await regionRepository.GetById(id);//_context.Regions.Where(r => r.Id == id).FirstOrDefaultAsync();
 
-                #region updating the data based on id from route
-                regionData.Name = updateReqDTO.Name;
-                regionData.Code = updateReqDTO.Code;
-                regionData.RegionImageUrl = updateReqDTO.RegionImageUrl;
-                #endregion
+            if (regionData == null)
+                return NotFound();
 
-                //Reposiory Layer - Dependency Injection
-                int r = await regionRepository.UpdateRegions(id, regionData);
-                if (r == 0)
-                    return BadRequest("Update Failed..");
+            #region updating the data based on id from route
+            regionData.Name = updateReqDTO.Name;
+            regionData.Code = updateReqDTO.Code;
+            regionData.RegionImageUrl = updateReqDTO.RegionImageUrl;
+            #endregion
 
-                // AutoMapper source = regionData, destination = RegionDTO
-                var regionDTO = mapper.Map<RegionDTO>(regionData);
+            //Reposiory Layer - Dependency Injection
+            int r = await regionRepository.UpdateRegions(id, regionData);
+            if (r == 0)
+                return BadRequest("Update Failed..");
 
-                return Ok(regionDTO);
-            }
-            else
-            { 
-                return BadRequest(ModelState);
-            }
+            // AutoMapper source = regionData, destination = RegionDTO
+            var regionDTO = mapper.Map<RegionDTO>(regionData);
+
+            return Ok(regionDTO);
         }
 
         [HttpDelete]
@@ -153,9 +143,9 @@ namespace API.Controllers
 
             //Reposiory Layer - Dependency Injection
             int r = await regionRepository.DeleteRegions(id);
-            if (r == 0) 
+            if (r == 0)
                 return NotFound("Record delete failed");
-           
+
             // AutoMapper source = regions ; destination = RegionDTO
             var regionsDTO = mapper.Map<RegionDTO>(regions);
 
