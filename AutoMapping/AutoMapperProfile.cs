@@ -10,8 +10,8 @@ namespace API.AutoMapping
         {
             #region Region Table
             CreateMap<RegionDTO,Region>().ReverseMap();
-            CreateMap<AddRequestDTO,Region>().ReverseMap();
-            CreateMap<UpdateReqDTO, Region>().ReverseMap();
+            CreateMap<AddRegionsDTO,Region>().ReverseMap();
+            CreateMap<UpdateRegionsDTO, Region>().ReverseMap();
 
             //When we have different property name
             //CreateMap<RegionDTO, Region>()

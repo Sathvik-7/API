@@ -67,7 +67,7 @@ namespace API.Controllers
 
         [HttpPost]
         [ValidationStateFilter]
-        public async Task<IActionResult> Create([FromBody] AddRequestDTO addRequestDTO)
+        public async Task<IActionResult> Create([FromBody] AddRegionsDTO addRequestDTO)
         {
             #region Mapping data from DTO to Model - Outdated
             //var regions = new Region()
@@ -105,7 +105,7 @@ namespace API.Controllers
         [HttpPut]
         [Route("{id:guid}")]
         [ValidationStateFilter]
-        public async Task<IActionResult> PutData([FromRoute] Guid id, [FromBody] UpdateReqDTO updateReqDTO)
+        public async Task<IActionResult> PutData([FromRoute] Guid id, [FromBody] UpdateRegionsDTO updateReqDTO)
         {
 
             //Reposiory Layer - Dependency Injection

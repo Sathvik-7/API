@@ -2,7 +2,7 @@
 
 namespace API.Models.DTO
 {
-    public class AddRequestDTO
+    public class AddRegionsDTO
     {
         [Required]
         [MaxLength(7)]

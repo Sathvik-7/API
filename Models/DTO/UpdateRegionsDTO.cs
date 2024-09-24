@@ -2,7 +2,7 @@
 
 namespace API.Models.DTO
 {
-    public class UpdateReqDTO
+    public class UpdateRegionsDTO
     {
         [Required]
         [MaxLength(7)]
