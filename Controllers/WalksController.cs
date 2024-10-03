@@ -22,9 +22,12 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetWalkData()
+        public async Task<IActionResult> GetWalkData([FromQuery]string? filterOn, [FromQuery]string? filterQuery
+            ,[FromQuery]string? sortBy, [FromQuery]bool? isAsc, [FromQuery]int pageNumber = 1, 
+            [FromQuery]int pageSize = 3)
         {
-            var walksData = await walkRepository.GetWalkAsync();
+            var walksData = await walkRepository.GetWalkAsync(filterOn, filterQuery,sortBy, isAsc ?? true,
+                pageNumber,pageSize);
 
             //Map Domain Model to DTO
             return Ok(mapper.Map<List<WalkDTO>>(walksData));

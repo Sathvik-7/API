@@ -4,7 +4,8 @@ namespace API.Repository.Interface
 {
     public interface IWalkRepository
     {
-        Task<List<Walk>> GetWalkAsync();
+        Task<List<Walk>> GetWalkAsync(string? filterOn = null, string? filterQuery = null,
+            string? sortBy = null , bool isAsc = true,int pageNumber = 1,int pageSize = 3);
 
         Task<Walk?> GetWalkByIdAsync(Guid id);
 
